@@ -70,8 +70,8 @@ onBeforeMount(() => {
 </script>
 
 <template>
-    <div class="flex flex-col items-start gap-6 mt-6">
-        <Card class="w-full">
+    <div class="flex flex-col items-start gap-6 mt-6 lg:flex-row">
+        <Card class="w-full lg:w-2/5">
             <form @submit.prevent="createProject">
                 <CardHeader>
                     <CardTitle>New Laravel Project</CardTitle>
@@ -123,7 +123,7 @@ onBeforeMount(() => {
             </form>
         </Card>
 
-        <Card class="flex flex-col w-full gap-4">
+        <Card class="flex flex-col w-full gap-4 lg:w-3/5">
             <CardHeader>
                 <CardTitle>Log:</CardTitle>
 

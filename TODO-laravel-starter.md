@@ -6,12 +6,12 @@
 
 ## Name ideas:
 
-- QuickLaravel
+- Laravel Quick
 - InstaLaravel
-- LaravelGenie
-- LaravelCraft
-- LaravelBlueprint
-- LaravelFactory
+- Laravel Genie
+- Laravel Craft
+- Laravel Blueprint
+- Laravel Factory
 
 ## All options of laravel installer:
 

@@ -1,34 +1,49 @@
 # laravel-quick
 
-An Electron application with Vue and TypeScript
+An one-click way to quickly create a Laravel application with all the features you need!
 
-## Recommended IDE Setup
+![Screenshot-1](https://github.com/dougkusanagi/guepardosys-hub/blob/main/screenshot-1.png?raw=true)
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin)
+![Screenshot-2](https://github.com/dougkusanagi/guepardosys-hub/blob/main/screenshot-2.png?raw=true)
+
+## Todo:
+
+- [ ] Create a database name based on project name and checking if it already exists
+- [ ] Add Tray menu with (New Preset, (Preset 1, Preset 2, Preset 3...), About, Exit)
+- [ ] After create the project, open with default code editor
+
+## Name ideas:
+
+- Laravel Quick
+- InstaLaravel
+- Laravel Genie
+- Laravel Craft
+- Laravel Blueprint
+- Laravel Factory
 
 ## Project Setup
 
 ### Install
 
 ```bash
-$ pnpm install
+$ bun install
 ```
 
 ### Development
 
 ```bash
-$ pnpm dev
+$ bun dev
 ```
 
 ### Build
 
 ```bash
 # For windows
-$ pnpm build:win
+$ bun build:win
 
 # For macOS
-$ pnpm build:mac
+$ bun build:mac
 
 # For Linux
-$ pnpm build:linux
+$ bun build:linux
 ```
