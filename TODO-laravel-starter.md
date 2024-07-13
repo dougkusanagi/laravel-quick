@@ -1,7 +1,7 @@
 ## Todo:
 
 - [ ] Create a database name based on project name and checking if it already exists
-- [ ] Add Tray menu with (New Preset, Preset 1, Preset 2, Preset 3..., About, Exit)
+- [ ] Add Tray menu with (New Preset, (Preset 1, Preset 2, Preset 3...), About, Exit)
 - [ ] After create the project, open with default code editor
 
 ## Name ideas:

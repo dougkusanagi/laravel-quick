@@ -5,10 +5,13 @@ import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/laravel-quick.png?asset";
 import { JsonDB, Config } from "node-json-db";
 import { v4 as uuidv4 } from "uuid";
+import type { Preset } from "../../types/preset";
+
+let mainWindow: BrowserWindow | null = null;
 
 function createWindow(): void {
 	// Create the browser window.
-	const mainWindow = new BrowserWindow({
+	mainWindow = new BrowserWindow({
 		width: 900,
 		height: 670,
 		show: false,
@@ -33,6 +36,7 @@ function createWindow(): void {
 	// Load the remote URL for development or the local html file for production.
 	if (is.dev && process.env.ELECTRON_RENDERER_URL) {
 		mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL);
+		mainWindow.webContents.openDevTools();
 	} else {
 		mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
 	}
@@ -40,29 +44,58 @@ function createWindow(): void {
 
 async function executeCommand(
 	command: string,
-	_cwp: string | null = null,
+	preset: Preset,
 ): Promise<number> {
 	return new Promise((resolve, reject) => {
-		const cwp = _cwp || process.cwd();
-		const childProcess = exec(command, { cwd: cwp });
+		const childProcess = exec(command, { cwd: preset.cwp });
 
 		childProcess.stdout?.on("data", (data: string) => {
 			console.log(data);
 
+			mainWindow.webContents.send("append-log", data);
+
+			if (data.includes("Would you like to install a starter kit?")) {
+				mainWindow.webContents.send("append-log", "none\n");
+				childProcess.stdin?.write("none\n");
+			}
+
+			if (data.includes("Which testing framework do you prefer?")) {
+				mainWindow.webContents.send("append-log", `${preset.test}\n`);
+				childProcess.stdin?.write(`${preset.test}\n`);
+			}
+
 			if (data.includes("Which Breeze stack would you like to install?")) {
-				childProcess.stdin?.write("livewire\n");
+				mainWindow.webContents.send("append-log", `${preset.breeze_stack}\n`);
+				childProcess.stdin?.write(`${preset.breeze_stack}\n`);
+			}
+
+			if (data.includes("Which Jetstream stack would you like to install?")) {
+				mainWindow.webContents.send(
+					"append-log",
+					`${preset.jetstream_stack}\n`,
+				);
+				childProcess.stdin?.write(`${preset.jetstream_stack}\n`);
+			}
+
+			if (data.includes("Would you like any optional features?")) {
+				const optionals = preset.jetstream_optionals.join(",");
+				mainWindow.webContents.send("append-log", `${optionals}\n`);
+				childProcess.stdin?.write(`${optionals}\n`);
 			}
 
 			if (data.includes("Would you like dark mode support?")) {
+				mainWindow.webContents.send("append-log", "no\n");
 				childProcess.stdin?.write("no\n");
 			}
 
 			if (data.includes("Would you like to initialize a Git repository?")) {
+				mainWindow.webContents.send("append-log", "no\n");
 				childProcess.stdin?.write("no\n");
 			}
 
 			if (data.includes("Which database will your application use?")) {
-				childProcess.stdin?.write("sqlite\n");
+				mainWindow.webContents.send("append-log", `${preset.database}\n`);
+				childProcess.stdin?.write(`${preset.database}\n`);
 			}
 		});
 
@@ -130,12 +163,50 @@ app.whenReady().then(() => {
 		await db.push("/presets", [preset], false);
 	});
 
-	ipcMain.on("create-project", async () => {
-		const project = { name: "abc" };
-		const cwp = "D:/laragon/www";
-		const command = `laravel new ${project.name}`;
+	ipcMain.on("create-project", async (_event, project) => {
+		console.log(project);
 
-		await executeCommand(command, cwp);
+		const db = getDb();
+		const index = await db.getIndex("/presets", project.preset);
+		const preset = await db.getData(`/presets[${index}]`);
+
+		// id: '482a39eb-5796-474f-b9a0-607e57c84c18',
+		// name: 'abc',
+		// cwp: 'D:/laragon/www',
+		// test: 'pest',
+		// git: false,
+		// dark_mode: false,
+		// database: 'sqlite',
+		// scaffolding: '',
+		// breeze_stack: 'blade',
+		// jetstream_stack: 'livewire',
+		// jetstream_optionals: []
+
+		let command = "laravel new";
+
+		if (preset.git) {
+			command += " --git";
+		}
+
+		if (preset.dark_mode) {
+			command += " --dark";
+		}
+
+		if (preset.scaffolding) {
+			command += ` --${preset.scaffolding}`;
+		}
+
+		command += ` ${project.name}`;
+
+		if (project.cwp) {
+			preset.cwp = project.cwp;
+		}
+
+		// console.log("preset=", preset);
+		// console.log("command=", command);
+		// return;
+
+		await executeCommand(command, preset);
 
 		const notification = new Notification({
 			title: "Projeto criado com sucesso.",
@@ -146,7 +217,7 @@ app.whenReady().then(() => {
 			console.log("Notification clicked");
 
 			try {
-				const resp = await shell.openPath(cwp);
+				const resp = await shell.openPath(`preset.cwp/${project.name}`);
 				console.log(resp);
 			} catch (error) {
 				console.error(error);

@@ -2,14 +2,14 @@
     "presets": [
         {
             "id": "482a39eb-5796-474f-b9a0-607e57c84c18",
-            "name": "abc",
+            "name": "breeze-git-dark-livewire-sqlite",
             "cwp": "D:/laragon/www",
-            "test": "pest",
+            "test": 0,
             "git": false,
             "dark_mode": false,
             "database": "sqlite",
-            "scaffolding": "",
-            "breeze_stack": "blade",
+            "scaffolding": "breeze",
+            "breeze_stack": "livewire",
             "jetstream_stack": "livewire",
             "jetstream_optionals": []
         }

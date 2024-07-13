@@ -22,6 +22,11 @@ import {
     TableRow,
 } from "@renderer/components/ui/table";
 
+enum Test {
+    Pest = 0,
+    PhpUnit = 1,
+}
+
 // const presets = [
 //     { id: 0, name: "Empty" },
 //     { id: 1, name: "Breeze Livewire" },
@@ -31,9 +36,9 @@ import {
 const presets = ref<Preset[]>([]);
 
 const form_new_preset = reactive<Preset>({
-    name: "abc",
+    name: "",
     cwp: "D:/laragon/www",
-    test: "pest",
+    test: Test.Pest,
     git: false,
     dark_mode: false,
     database: "sqlite",
@@ -61,6 +66,7 @@ const loadPresets = async () => {
 onMounted(() => {
     loadPresets();
 });
+
 </script>
 
 <template>
@@ -258,7 +264,7 @@ onMounted(() => {
                             </div>
 
                             <div class="flex items-center space-x-2">
-                                <RadioGroupItem id="jetstream-stack-r3" value="vue" />
+                                <RadioGroupItem id="jetstream-stack-r3" value="inertia" />
                                 <Label for="jetstream-stack-r3">Vue with Inertia</Label>
                             </div>
                         </RadioGroup>
@@ -310,7 +316,8 @@ onMounted(() => {
                             </label>
                         </div>
 
-                        <div class="flex items-center mt-2 space-x-2">
+                        <div v-if="form_new_preset.jetstream_stack === 'inertia'"
+                            class="flex items-center mt-2 space-x-2">
                             <input type="checkbox" v-model="form_new_preset.jetstream_optionals"
                                 id="jetstream-optiona-r5" value="ssr" />
 

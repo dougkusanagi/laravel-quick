@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Preset } from "../../../../types/preset"
-import { onMounted, reactive, ref } from "vue";
+import { onBeforeMount, reactive, ref, toRaw } from "vue";
 import { useToast } from "@renderer/components/ui/toast/use-toast";
 import { Input } from "@renderer/components/ui/input";
 import { Label } from "@renderer/components/ui/label";
@@ -26,31 +26,40 @@ import {
 const { toast } = useToast();
 const presets = ref<Preset[]>([]);
 const log = ref("");
+const log_ref = ref(null);
 const laravel_project = reactive({
     name: "",
     preset: "",
+    cwp: "",
 });
 
-const ipcLaravel = () => {
-    window.electron.ipcRenderer.send("create-project", laravel_project);
-    toast({ title: "Laravel", description: "Teste Laravel" });
+const createProject = () => {
+    const raw_project = toRaw(laravel_project);
+    window.electron.ipcRenderer.send("create-project", raw_project);
+    // toast({ title: "Laravel", description: "Teste Laravel" });
 };
 
 const loadPresets = async () => {
     try {
         const data = await window.electron.ipcRenderer.invoke("get-presets");
-        console.log(data);
         presets.value = data;
     } catch (error) {
         console.error('Error loading presets:', error);
     }
 };
 
+const scrollToEnd = () => {
+    if (log_ref.value) {
+        log_ref.value.scrollTop = log_ref.value.scrollHeight;
+    }
+};
+
 window.electron.ipcRenderer.on("append-log", (_, message) => {
     log.value += `${message}\n`;
+    scrollToEnd();
 })
 
-onMounted(() => {
+onBeforeMount(() => {
     loadPresets();
 });
 </script>
@@ -58,7 +67,7 @@ onMounted(() => {
 <template>
     <div class="flex flex-col items-start gap-6 mt-6 lg:flex-row">
         <Card class="w-full lg:w-2/5">
-            <form @submit.prevent="ipcLaravel">
+            <form @submit.prevent="createProject">
                 <CardHeader>
                     <CardTitle>New Laravel Project</CardTitle>
 
@@ -77,7 +86,7 @@ onMounted(() => {
                     <div class="space-y-1">
                         <Label for="preset">Preset</Label>
 
-                        <Select id="preset">
+                        <Select v-model="laravel_project.preset" id="preset">
                             <SelectTrigger>
                                 <SelectValue placeholder="Select the preset" />
                             </SelectTrigger>
@@ -94,6 +103,12 @@ onMounted(() => {
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
+                    </div>
+
+                    <div v-if="false" class="space-y-1">
+                        <Label for="cwp">Change Path</Label>
+                        <Input v-model="laravel_project.cwp" id="cwp"
+                            placeholder="default is configured in the preset" />
                     </div>
                 </CardContent>
 
@@ -112,7 +127,7 @@ onMounted(() => {
                 </CardDescription>
             </CardHeader>
 
-            <ScrollArea class=" bg-[hsl(222.2,47.4%,11.2%)] p-4 text-white/80 h-96 rounded-b-lg">
+            <ScrollArea ref="log_ref" class=" bg-[hsl(222.2,47.4%,11.2%)] p-4 text-white/80 h-96 rounded-b-lg">
                 <pre class="text-sm">{{ log }}</pre>
             </ScrollArea>
         </Card>

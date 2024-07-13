@@ -5,10 +5,15 @@ export type BreezeStack =
 	| "vue"
 	| "api";
 export type Database = "sqlite" | "mysql" | "mariadb" | "pgsql" | "sqlsrv";
-export type JetstreamStack = "livewire" | "livewire-functional";
+export type JetstreamStack = "livewire" | "inertia";
 export type JetstreapOptionals = "api" | "ssr" | "teams" | "verification";
 export type Scaffolding = "" | "breeze" | "jet";
-export type Test = "pest" | "php-unit";
+// export type Test = "pest" | "php-unit";
+export enum Test {
+	Pest = 0,
+	PhpUnit = 1,
+}
+
 export interface Preset {
 	id?: string;
 	name: string;
