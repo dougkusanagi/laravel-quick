@@ -1,36 +1,43 @@
 <script setup lang="ts">
-import { Input } from "@renderer/components/ui/input";
-import { Label } from "@renderer/components/ui/label";
-import { Button } from "@renderer/components/ui/button";
-import { useToast } from "@renderer/components/ui/toast/use-toast";
+import NewPreset from "@renderer/components/NewPreset.vue";
+import NewProject from "@renderer/components/NewProject.vue";
 import { Toaster } from "@renderer/components/ui/toast";
-import { reactive } from "vue";
-
-const { toast } = useToast();
-
-interface LaravelProject {
-	name: string;
-	stack: string;
-}
-
-const laravel_config: LaravelProject = reactive({});
-
-const ipcLaravel = () => {
-	window.electron.ipcRenderer.send("teste-laravel", "abc");
-	toast({ title: "Laravel", description: "Teste Laravel" });
-};
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@renderer/components/ui/tabs";
 </script>
 
 <template>
   <Toaster />
+
   <div class="container mx-auto">
-    <h1 class="text-3xl font-bold mt-8">Hello World</h1>
+    <h1 class="mt-8 text-3xl font-bold">Laravel Quick</h1>
 
-    <div class="grid w-full max-w-sm items-center gap-1.5 my-6">
-      <Label for="email">Email</Label>
-      <Input id="email" type="email" placeholder="Email" />
-    </div>
+    <p class="max-w-lg leading-relaxed text-muted-foreground text-balance">
+      A quick and easy way to get started with Laravel.
+    </p>
 
-    <Button @click="ipcLaravel">Teste Laravel</Button>
+    <Tabs default-value="new-project">
+      <TabsList class="grid w-full grid-cols-2 mt-12">
+        <TabsTrigger value="new-project">
+          New Project
+        </TabsTrigger>
+
+        <TabsTrigger value="new-preset">
+          New Preset
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="new-project">
+        <NewProject />
+      </TabsContent>
+
+      <TabsContent value="new-preset">
+        <NewPreset />
+      </TabsContent>
+    </Tabs>
   </div>
 </template>

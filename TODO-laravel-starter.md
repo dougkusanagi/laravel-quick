@@ -53,4 +53,27 @@ Options:
       --ansi|--no-ansi             Force (or disable --no-ansi) ANSI output
   -n, --no-interaction             Do not ask any interactive question
   -v|vv|vvv, --verbose             Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+ Which Breeze stack would you like to install? [Blade with Alpine]:
+  - [blade              ] Blade with Alpine
+  - [livewire           ] Livewire (Volt Class API) with Alpine
+  - [livewire-functional] Livewire (Volt Functional API) with Alpine
+  - [react              ] React with Inertia
+  - [vue                ] Vue with Inertia
+  - [api                ] API only
+
+  Which database will your application use? [SQLite]:
+  - [sqlite ] SQLite
+  - [mysql  ] MySQL
+  - [mariadb] MariaDB
+  - [pgsql  ] PostgreSQL
+  - [sqlsrv ] SQL Server (Missing PDO extension)
+
+  Would you like any optional features? [None]:
+  - [none        ] None
+  - [api         ] API support
+  - [dark        ] Dark mode
+  - [verification] Email verification
+  - [teams       ] Team support
+  - [ssr         ] Inertia SSR
 ```

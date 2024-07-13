@@ -1,0 +1,17 @@
+{
+    "presets": [
+        {
+            "id": "482a39eb-5796-474f-b9a0-607e57c84c18",
+            "name": "abc",
+            "cwp": "D:/laragon/www",
+            "test": "pest",
+            "git": false,
+            "dark_mode": false,
+            "database": "sqlite",
+            "scaffolding": "",
+            "breeze_stack": "blade",
+            "jetstream_stack": "livewire",
+            "jetstream_optionals": []
+        }
+    ]
+}
