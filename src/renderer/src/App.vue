@@ -8,6 +8,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@renderer/components/ui/tabs";
+import { ref } from "vue";
+
+const tab_selected = ref("new-project");
 </script>
 
 <template>
@@ -20,8 +23,8 @@ import {
       A quick and easy way to get started with Laravel.
     </p>
 
-    <Tabs default-value="new-project">
-      <TabsList class="grid w-full grid-cols-2 mt-12">
+    <Tabs :default-value="tab_selected">
+      <TabsList class="grid w-full grid-cols-2 mt-6">
         <TabsTrigger value="new-project">
           New Project
         </TabsTrigger>

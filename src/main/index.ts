@@ -1,5 +1,13 @@
-import { app, shell, BrowserWindow, ipcMain, Notification } from "electron";
-import { join } from "node:path";
+import {
+	app,
+	shell,
+	BrowserWindow,
+	ipcMain,
+	Notification,
+	Tray,
+	Menu,
+} from "electron";
+import { join, resolve } from "node:path";
 import { exec, type ExecException } from "node:child_process";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/laravel-quick.png?asset";
@@ -8,6 +16,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { Preset } from "../../types/preset";
 
 let mainWindow: BrowserWindow | null = null;
+let tray = null;
 
 function createWindow(): void {
 	// Create the browser window.
@@ -24,7 +33,7 @@ function createWindow(): void {
 	});
 
 	mainWindow.on("ready-to-show", () => {
-		mainWindow.show();
+		// mainWindow.show();
 	});
 
 	mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -36,7 +45,7 @@ function createWindow(): void {
 	// Load the remote URL for development or the local html file for production.
 	if (is.dev && process.env.ELECTRON_RENDERER_URL) {
 		mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL);
-		mainWindow.webContents.openDevTools();
+		// mainWindow.webContents.openDevTools();
 	} else {
 		mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
 	}
@@ -133,9 +142,33 @@ function getDb({
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
 	// Set app user model id for windows
 	electronApp.setAppUserModelId("com.electron");
+
+	tray = new Tray(resolve(__dirname, "../../resources/laravel-quick.png"));
+
+	const db = getDb();
+	const presets = await db.getData("/presets");
+
+	const presets_menu = presets.map((preset: Preset) => ({
+		label: preset.name,
+		type: "normal",
+		click: () => {
+			mainWindow.webContents.send("preset-selected", preset);
+			mainWindow.show();
+		},
+	}));
+
+	const contextMenu = Menu.buildFromTemplate([
+		{ label: "New Preset", type: "normal" },
+		{ type: "separator" },
+		...presets_menu,
+		{ type: "separator" },
+		{ label: "Quit", type: "normal" },
+	]);
+	tray.setToolTip("This is my application.");
+	tray.setContextMenu(contextMenu);
 
 	// Default open or close DevTools by F12 in development
 	// and ignore CommandOrControl + R in production.
@@ -161,6 +194,11 @@ app.whenReady().then(() => {
 		const db = getDb();
 
 		await db.push("/presets", [preset], false);
+
+		new Notification({
+			title: "Preset criado com sucesso.",
+			body: "Você pode agora criar um novo projeto com apenas um click.",
+		});
 	});
 
 	ipcMain.on("create-project", async (_event, project) => {
@@ -169,18 +207,6 @@ app.whenReady().then(() => {
 		const db = getDb();
 		const index = await db.getIndex("/presets", project.preset);
 		const preset = await db.getData(`/presets[${index}]`);
-
-		// id: '482a39eb-5796-474f-b9a0-607e57c84c18',
-		// name: 'abc',
-		// cwp: 'D:/laragon/www',
-		// test: 'pest',
-		// git: false,
-		// dark_mode: false,
-		// database: 'sqlite',
-		// scaffolding: '',
-		// breeze_stack: 'blade',
-		// jetstream_stack: 'livewire',
-		// jetstream_optionals: []
 
 		let command = "laravel new";
 
@@ -201,10 +227,6 @@ app.whenReady().then(() => {
 		if (project.cwp) {
 			preset.cwp = project.cwp;
 		}
-
-		// console.log("preset=", preset);
-		// console.log("command=", command);
-		// return;
 
 		await executeCommand(command, preset);
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Preset } from "../../../../types/preset"
+import type { Preset, Test } from "../../../../types/preset"
 import { onMounted, reactive, ref, toRaw } from "vue";
 import { Switch } from "@renderer/components/ui/switch";
 import { Button } from "@renderer/components/ui/button";
@@ -22,23 +22,12 @@ import {
     TableRow,
 } from "@renderer/components/ui/table";
 
-enum Test {
-    Pest = 0,
-    PhpUnit = 1,
-}
-
-// const presets = [
-//     { id: 0, name: "Empty" },
-//     { id: 1, name: "Breeze Livewire" },
-//     { id: 2, name: "Breeze Git Pest SQlite" },
-// ] as const;
-
 const presets = ref<Preset[]>([]);
 
 const form_new_preset = reactive<Preset>({
     name: "",
     cwp: "D:/laragon/www",
-    test: Test.Pest,
+    test: "0",
     git: false,
     dark_mode: false,
     database: "sqlite",
@@ -50,13 +39,12 @@ const form_new_preset = reactive<Preset>({
 
 function storePreset() {
     const rawPreset = toRaw(form_new_preset);
-    window.Electron.ipcRenderer.send("store-preset", rawPreset);
+    window.electron.ipcRenderer.send("store-preset", rawPreset);
 }
 
 const loadPresets = async () => {
     try {
         const data = await window.electron.ipcRenderer.invoke("get-presets");
-        console.log(data);
         presets.value = data;
     } catch (error) {
         console.error('Error loading presets:', error);
@@ -70,8 +58,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="flex items-start gap-6 mt-6">
-        <Card class="w-1/2">
+    <div class="flex flex-col items-start gap-6 mt-6 md:flex-row">
+        <Card class="w-full md:w-1/2">
             <CardHeader>
                 <CardTitle>Preset List ({{ presets.length }})</CardTitle>
 
@@ -101,7 +89,7 @@ onMounted(() => {
             </Table>
         </Card>
 
-        <Card class="w-1/2">
+        <Card class="w-full md:w-1/2">
             <form @submit.prevent="storePreset">
                 <CardHeader>
                     <CardTitle>New Preset</CardTitle>
@@ -144,14 +132,14 @@ onMounted(() => {
                                     Test Framework
                                 </h3>
 
-                                <RadioGroup v-model="form_new_preset.test" class="mt-2" default-value="pest">
+                                <RadioGroup v-model="form_new_preset.test" class="mt-2">
                                     <div class="flex items-center space-x-2">
-                                        <RadioGroupItem id="test-r1" value="pest" />
+                                        <RadioGroupItem id="test-r1" value="0" />
                                         <Label for="test-r1">Pest</Label>
                                     </div>
 
                                     <div class="flex items-center space-x-2">
-                                        <RadioGroupItem id="test-r2" value="php-unit" />
+                                        <RadioGroupItem id="test-r2" value="1" />
                                         <Label for="test-r2">PHP Unit</Label>
                                     </div>
                                 </RadioGroup>

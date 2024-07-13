@@ -8,11 +8,7 @@ export type Database = "sqlite" | "mysql" | "mariadb" | "pgsql" | "sqlsrv";
 export type JetstreamStack = "livewire" | "inertia";
 export type JetstreapOptionals = "api" | "ssr" | "teams" | "verification";
 export type Scaffolding = "" | "breeze" | "jet";
-// export type Test = "pest" | "php-unit";
-export enum Test {
-	Pest = 0,
-	PhpUnit = 1,
-}
+export type Test = "0" | "1";
 
 export interface Preset {
 	id?: string;
